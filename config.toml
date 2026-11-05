@@ -1,0 +1,9 @@
+# Base theme for Streamlit's own widgets (sliders, toggles, focus rings).
+# The in-app Light / Dark switch overrides colours at runtime via design.py.
+[theme]
+base = "dark"
+primaryColor = "#D100D1"
+backgroundColor = "#031326"
+secondaryBackgroundColor = "#0A203A"
+textColor = "#FFFFFF"
+font = "sans serif"
