@@ -237,7 +237,7 @@ def model_specs() -> dict:
              "clf__min_samples_leaf": [1, 2, 4]},
         ),
         "Random Forest": (
-            make_pipe(RandomForestClassifier(random_state=RANDOM_STATE, n_jobs=-1), scale=False),
+            make_pipe(RandomForestClassifier(random_state=RANDOM_STATE, n_jobs=1), scale=False),
             {"clf__n_estimators": [100, 200, 300],
              "clf__max_depth": [None, 5, 10],
              "clf__min_samples_leaf": [1, 2],
@@ -263,7 +263,7 @@ def tune_models(X_train, y_train):
     cv = StratifiedKFold(n_splits=CV_FOLDS, shuffle=True, random_state=RANDOM_STATE)
     best_models, tuning = {}, []
     for name, (pipe, grid) in model_specs().items():
-        gs = GridSearchCV(pipe, grid, scoring="f1", cv=cv, n_jobs=-1, refit=True)
+        gs = GridSearchCV(pipe, grid, scoring="f1", cv=cv, n_jobs=1, refit=True)
         gs.fit(X_train, y_train)  # TRAIN ONLY
         best_models[name] = gs.best_estimator_
         tuning.append({
@@ -311,7 +311,7 @@ def repeated_cv(best_models, X_train, y_train) -> pd.DataFrame:
     rcv = RepeatedStratifiedKFold(n_splits=CV_FOLDS, n_repeats=CV_REPEATS, random_state=RANDOM_STATE)
     rows = []
     for name, model in best_models.items():
-        res = cross_validate(model, X_train, y_train, cv=rcv, n_jobs=-1,
+        res = cross_validate(model, X_train, y_train, cv=rcv, n_jobs=1,
                              scoring={"recall": "recall", "f1": "f1", "roc_auc": "roc_auc"})
         rows.append({
             "Model": name,
