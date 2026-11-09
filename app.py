@@ -1,10 +1,11 @@
+
 """
 Tumour Classifier · Breast Cancer Wisconsin (Original)
 
 Run with:  streamlit run app.py
 
 Layers
-  ml_pipeline.py  data loading, cleaning, tuning and evaluation (a port of the notebook)
+  ml_pipeline.py  data loading, cleaning, tuning and evaluation
   charts.py       Plotly figures built from pipeline outputs
   design.py       palettes, global CSS and reusable HTML components
   app.py          page composition, navigation and the light / dark theme switch
@@ -12,13 +13,16 @@ Layers
 
 from __future__ import annotations
 
+from pathlib import Path
+
+import joblib
 import numpy as np
 import pandas as pd
 import streamlit as st
 
 import charts as C
 import design as D
-from ml_pipeline import METRICS, MODEL_NAMES, predict_one, run_pipeline, verify_against_notebook
+from ml_pipeline import METRICS, MODEL_NAMES, predict_one
 
 PAGES = ["Overview", "Data & EDA", "Model Performance", "Model Comparison", "Try a Prediction"]
 
@@ -39,15 +43,20 @@ st.set_page_config(
 
 
 # --------------------------------------------------------------------------- #
-# Cached pipeline
+# Cached pre-trained artifacts
 # --------------------------------------------------------------------------- #
 @st.cache_resource(show_spinner=False)
 def load_all() -> dict:
-    """Run the notebook pipeline once per server process and reuse the result."""
-    art = run_pipeline()
-    art["verification"] = verify_against_notebook(art)
-    return art
+    """Load pre-trained models and results without retraining."""
+    artifacts_path = Path(__file__).parent / "model_artifacts.joblib"
 
+    if not artifacts_path.exists():
+        raise FileNotFoundError(
+            "model_artifacts.joblib not found. "
+            "Please generate it using build_artifacts.py."
+        )
+
+    return joblib.load(artifacts_path)
 
 # --------------------------------------------------------------------------- #
 # Small helpers
